@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Rezept Manager</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="auth-box">
+            <h1>🍳 Rezept Manager</h1>
+            <p class="subtitle">Willkommen zurück!</p>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="form-container">
+                <h2>Login</h2>
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Passwort</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <span id="loginBtnText">Einloggen</span>
+                        <span id="loginLoader" class="loader" style="display: none;"></span>
+                    </button>
+                </form>
+                <p class="switch-form">
+                    Noch kein Account? 
+                    <a href="#" onclick="showRegister()">Jetzt registrieren</a>
+                </p>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerForm" class="form-container" style="display: none;">
+                <h2>Registrieren</h2>
+                <form onsubmit="handleRegister(event)">
+                    <div class="input-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" required minlength="3">
+                    </div>
+                    <div class="input-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="registerPassword">Passwort</label>
+                        <input type="password" id="registerPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <span id="registerBtnText">Registrieren</span>
+                        <span id="registerLoader" class="loader" style="display: none;"></span>
+                    </button>
+                </form>
+                <p class="switch-form">
+                    Schon registriert? 
+                    <a href="#" onclick="showLogin()">Zum Login</a>
+                </p>
+            </div>
+            
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+    
+    <script src="js/login.js"></script>
+</body>
+</html>

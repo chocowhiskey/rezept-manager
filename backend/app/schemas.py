@@ -58,6 +58,7 @@ class Rezept(RezeptBase):
     id: int
     erstellt_am: datetime
     user_id: int
+    owner: User  # Username wird angezeigt
     tags: List[Tag] = []
     
     class Config:

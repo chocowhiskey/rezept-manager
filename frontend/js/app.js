@@ -1,10 +1,39 @@
 const API_URL = 'http://localhost:8000';
 let allRecipes = [];
 
-// Beim Laden der Seite Rezepte laden
+// Beim Laden der Seite prüfen ob eingeloggt
 document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    
+    if (!token) {
+        // Nicht eingeloggt -> zu Login weiterleiten
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // Username anzeigen
+    document.getElementById('currentUser').textContent = `👤 ${username}`;
+    
+    // Rezepte laden
     loadRecipes();
 });
+
+// Logout
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    window.location.href = 'login.html';
+}
+
+// Get Authorization Header
+function getAuthHeader() {
+    const token = localStorage.getItem('token');
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+}
 
 // Rezept scrapen und hinzufügen
 async function scrapeRecipe() {
@@ -29,9 +58,7 @@ async function scrapeRecipe() {
     try {
         const response = await fetch(`${API_URL}/rezepte/scrape`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getAuthHeader(),
             body: JSON.stringify({ url: url })
         });
         
@@ -62,7 +89,16 @@ async function loadRecipes() {
     const grid = document.getElementById('recipesGrid');
     
     try {
-        const response = await fetch(`${API_URL}/rezepte`);
+        const response = await fetch(`${API_URL}/rezepte`, {
+            headers: getAuthHeader()
+        });
+        
+        if (response.status === 401) {
+            // Token abgelaufen
+            logout();
+            return;
+        }
+        
         allRecipes = await response.json();
         
         if (allRecipes.length === 0) {
@@ -95,6 +131,7 @@ function displayRecipes(recipes) {
             }
             <div class="recipe-content">
                 <h3 class="recipe-title">${recipe.titel}</h3>
+                <div class="recipe-owner">👤 ${recipe.owner.username}</div>
                 <div class="recipe-meta">
                     ${recipe.zubereitungszeit ? `<span>⏱️ ${recipe.zubereitungszeit}</span>` : ''}
                     ${recipe.portionen ? `<span>👥 ${recipe.portionen}</span>` : ''}
@@ -123,7 +160,9 @@ async function filterByTag(tagName) {
         if (tagName === 'all') {
             recipes = allRecipes;
         } else {
-            const response = await fetch(`${API_URL}/rezepte/tag/${tagName}`);
+            const response = await fetch(`${API_URL}/rezepte/tag/${tagName}`, {
+                headers: getAuthHeader()
+            });
             recipes = await response.json();
         }
         
@@ -140,7 +179,9 @@ async function showRecipeDetails(id) {
     const modalBody = document.getElementById('modalBody');
     
     try {
-        const response = await fetch(`${API_URL}/rezepte/${id}`);
+        const response = await fetch(`${API_URL}/rezepte/${id}`, {
+            headers: getAuthHeader()
+        });
         const recipe = await response.json();
         
         const ingredientsList = recipe.zutaten.split('\n')
@@ -154,6 +195,10 @@ async function showRecipeDetails(id) {
                 ''
             }
             <h2 class="modal-title">${recipe.titel}</h2>
+            
+            <div class="recipe-owner" style="font-size: 1rem; margin-bottom: 15px;">
+                👤 Hinzugefügt von: <strong>${recipe.owner.username}</strong>
+            </div>
             
             <div class="recipe-meta">
                 ${recipe.zubereitungszeit ? `<span>⏱️ ${recipe.zubereitungszeit}</span>` : ''}
@@ -212,7 +257,8 @@ async function deleteRecipe(id) {
     
     try {
         const response = await fetch(`${API_URL}/rezepte/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeader()
         });
         
         if (response.ok) {
