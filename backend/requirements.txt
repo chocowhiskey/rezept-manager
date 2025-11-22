@@ -1,0 +1,28 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+recipe-scrapers==14.51.0
+sqlalchemy==2.0.23
+pydantic==2.5.0
+beautifulsoup4==4.12.2
+requests==2.31.0
+```
+
+## .gitignore erstellen
+
+Wichtig für GitHub! Erstelle `.gitignore` im Root (`rezept-manager/`):
+```
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
