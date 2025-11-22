@@ -1,6 +1,32 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import datetime
+
+# User Schemas
+class UserBase(BaseModel):
+    username: str
+    email: EmailStr
+
+class UserCreate(UserBase):
+    password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class User(UserBase):
+    id: int
+    erstellt_am: datetime
+    
+    class Config:
+        from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
 
 # Tag Schemas
 class TagBase(BaseModel):
@@ -31,6 +57,7 @@ class RezeptCreate(BaseModel):
 class Rezept(RezeptBase):
     id: int
     erstellt_am: datetime
+    user_id: int
     tags: List[Tag] = []
     
     class Config:

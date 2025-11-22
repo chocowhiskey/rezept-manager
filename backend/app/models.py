@@ -11,12 +11,24 @@ rezept_tags = Table(
     Column('tag_id', Integer, ForeignKey('tags.id'))
 )
 
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(100), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(255), nullable=False)
+    erstellt_am = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationship zu Rezepten
+    rezepte = relationship("Rezept", back_populates="owner")
+
 class Rezept(Base):
     __tablename__ = "rezepte"
     
     id = Column(Integer, primary_key=True, index=True)
     titel = Column(String(255), nullable=False)
-    url = Column(String(500), unique=True, nullable=False)
+    url = Column(String(500), nullable=False)
     zutaten = Column(Text, nullable=False)
     zubereitung = Column(Text, nullable=False)
     bild_url = Column(String(500), nullable=True)
@@ -24,7 +36,11 @@ class Rezept(Base):
     zubereitungszeit = Column(String(50), nullable=True)
     erstellt_am = Column(DateTime, default=datetime.utcnow)
     
-    # Relationship zu Tags
+    # Foreign Key zu User
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    
+    # Relationships
+    owner = relationship("User", back_populates="rezepte")
     tags = relationship("Tag", secondary=rezept_tags, back_populates="rezepte")
 
 class Tag(Base):
